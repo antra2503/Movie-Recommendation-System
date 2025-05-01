@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import ast
 from PIL import Image
 import base64
+import zipfile
 
 # Set page config
 st.set_page_config(
@@ -129,6 +130,16 @@ def collapse(L):
 def load_and_process_data():
     # Load the movies data
     movies = pd.read_csv('tmdb_5000_movies.csv')
+    
+    # Check if the credits file is a zip and extract if necessary
+    try:
+        with zipfile.ZipFile('tmdb_5000_credits.zip', 'r') as zip_ref:
+            zip_ref.extract('tmdb_5000_credits.csv', path='.')
+    except Exception as e:
+        st.error(f"Error extracting credits file: {e}")
+        return None, None
+    
+    # Now load the extracted credits file
     credits = pd.read_csv('tmdb_5000_credits.csv')
     
     # Merge the datasets
@@ -253,4 +264,4 @@ try:
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
-    st.info("Please make sure both 'tmdb_5000_movies.csv' and 'tmdb_5000_credits.csv' files are present in the directory and try again.") 
+    st.info("Please make sure both 'tmdb_5000_movies.csv' and 'tmdb_5000_credits.csv' files are present in the directory and try again.")
